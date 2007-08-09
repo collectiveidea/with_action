@@ -19,7 +19,7 @@ module CollectiveIdea
       end
       
       def respond
-        action = @order.detect {|a| !@params[a].blank? }
+        action = @order.detect {|a| !@params[a].blank? || !@params["#{a}.x"].blank? }
         action ||= @order.include?(:any) ? :any : @order.first
         @responses[action].call if @responses[action]
       end
