@@ -6,6 +6,7 @@ require 'stubba'
 require File.dirname(__FILE__) + '/../lib/with_action'
 
 class WithActionTest < Test::Unit::TestCase
+  include CollectiveIdea::WithAction
   
   def setup
     @params = {}
@@ -18,48 +19,55 @@ class WithActionTest < Test::Unit::TestCase
   
   def test_calls_second_with_two_responses
     @params[:save] = true
-    @responder.cancel { @executed = :cancel }
-    @responder.save { @executed = :save }
-    @responder.respond
+    with_action do |a|
+      a.cancel { fail('cancel should not get called') }
+      a.save   { @executed = :save }
+    end
     assert_equal :save, @executed
   end
 
   def test_does_not_call_any_on_match
     @params[:cancel] = true
-    @responder.cancel { @executed = :cancel }
-    @responder.any { @executed = :any }
-    @responder.respond
+    with_action do |a|
+      a.cancel { @executed = :cancel }
+      a.any    { fail('any should not get called') }
+    end
     assert_equal :cancel, @executed
   end
 
   def test_any
     @params[:bar] = true
-    @responder.foo { @executed = :foo }
-    @responder.any do
-      @responder.bar { @executed = :bar }
+    with_action do |a|
+      a.foo { raise('foo should not get called') }
+      a.any do
+        a.bar { @executed = :bar }
+      end
     end
-    @responder.respond
     assert_equal :bar, @executed
   end
   
   def test_defaults_to_any_block
-    @responder.foo { @executed = :foo }
-    @responder.any { @executed = :any }
-    @responder.respond
+    with_action do |a|
+      a.foo { raise('foo should not get called') }
+      a.any { @executed = :any }
+    end
     assert_equal :any, @executed
   end
 
   def test_defaults_to_first_without_any_block
-    @responder.foo { @executed = :foo }
-    @responder.bar { fail('this should never get executed') }
-    @responder.respond
+    with_action do |a|
+      a.foo { @executed = :foo }
+      a.bar { fail('this should never get executed') }
+    end
     assert_equal :foo, @executed
   end
   
   def test_calls_method_without_block
     self.expects(:foo)
-    @responder.foo
-    @responder.respond
+    with_action do |a|
+      a.foo
+    end
+  end
   end
 
 end
