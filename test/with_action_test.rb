@@ -68,6 +68,11 @@ class WithActionTest < Test::Unit::TestCase
       a.foo
     end
   end
+
+  def test_takes_arguments_and_calls_method
+    self.expects(:bar)
+    @params[:bar] = true
+    with_action(:foo, :bar)
   end
 
 end

@@ -1,15 +1,10 @@
 module CollectiveIdea
   module WithAction
-    def self.included(base)
-      base.send(:include, InstanceMethods)
-    end
-
-    module InstanceMethods
-      def with_action
-        responder = ActionResponder.new(self)
-        yield responder
-        responder.respond
-      end
+    def with_action(*actions)
+      responder = ActionResponder.new(self)
+      yield responder if block_given?
+      actions.each {|a| responder.send(a) }
+      responder.respond
     end
     
     class ActionResponder

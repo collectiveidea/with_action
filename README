@@ -30,5 +30,30 @@ A block is invoked if a parameter with the same name exists and is not blank.  H
 
 If an @any@ block is present and no parameter that matches one of the other blocks, it is called by default, otherwise the first block will be called. The @any@ block is the only one that can have nesting and be called multiple times.
 
+If a block is not passed to the action, then a method with the same name is called on the controller: 
+
+  def update
+    with_action do |a|
+      a.publish
+      a.reject
+      a.any { redirect_to root_path }
+    end
+  end
+  
+  def publish
+    # …
+  end
+  
+  def reject
+    # …
+  end
+  
+Which can be abbreviated as:
+
+  def update
+    with_action(:publish, :reject) do |a|
+      a.any { redirect_to root_path }
+    end
+  end
 
 (c) Copyright 2007 Brandon Keepers (brandon@opensoul.org)
