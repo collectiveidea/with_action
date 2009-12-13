@@ -6,20 +6,22 @@ module CollectiveIdea
 
     module InstanceMethods
       def with_action
-        responder = ActionResponder.new(params)
+        responder = ActionResponder.new(self)
         yield responder
         responder.respond
       end
     end
     
     class ActionResponder
-      def initialize(params)
-        @params = params
+      def initialize(controller)
+        @controller = controller
         @order, @responses = [], {}
       end
       
       def respond
-        action = @order.detect {|a| !@params[a].blank? || !@params["#{a}.x"].blank? }
+        action = @order.detect do |a|
+          !@controller.params[a].blank? || !@controller.params["#{a}.x"].blank?
+        end
         action ||= @order.include?(:any) ? :any : @order.first
         @responses[action].call if @responses[action]
       end
@@ -36,6 +38,7 @@ module CollectiveIdea
       
       def method_missing(action, &block)
         @order << action
+        block ||= lambda { @controller.send(action) }
         @responses[action] = block
       end
     end
