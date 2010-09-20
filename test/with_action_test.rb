@@ -2,7 +2,6 @@ require 'test/unit'
 require 'rubygems'
 require 'active_support'
 require 'mocha'
-require 'stubba'
 require File.dirname(__FILE__) + '/../lib/with_action'
 
 class WithActionTest < Test::Unit::TestCase

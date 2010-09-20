@@ -25,7 +25,7 @@ module CollectiveIdea
         method_missing(:any) do
           # reset
           @order, @responses = [], {}
-          returning block.call do
+          block.call.tap do
             respond
           end
         end
