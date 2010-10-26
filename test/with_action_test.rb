@@ -5,11 +5,11 @@ require 'mocha'
 require File.dirname(__FILE__) + '/../lib/with_action'
 
 class WithActionTest < Test::Unit::TestCase
-  include CollectiveIdea::WithAction
+  include WithAction
   
   def setup
     @params = {}
-    @responder = CollectiveIdea::WithAction::ActionResponder.new(self)
+    @responder = WithAction::ActionResponder.new(self)
   end
   
   def params
